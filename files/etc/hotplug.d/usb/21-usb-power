@@ -1,0 +1,12 @@
+#!/bin/sh
+# Keep USB network dongles from autosuspending.
+
+[ "$ACTION" = add ] || exit 0
+[ -n "$DEVPATH" ] || exit 0
+
+ctrl="/sys${DEVPATH}/power/control"
+[ -w "$ctrl" ] && echo on > "$ctrl" 2>/dev/null
+
+echo -1 > /sys/module/usbcore/parameters/autosuspend 2>/dev/null || true
+
+exit 0

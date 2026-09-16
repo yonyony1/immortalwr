@@ -1,0 +1,59 @@
+#!/bin/sh
+# Bind USB Ethernet / RNDIS / CDC gadgets to a stable usbwan interface.
+
+[ "$ACTION" = add ] || exit 0
+[ -n "$DEVICENAME" ] || exit 0
+
+case "$DEVICENAME" in
+	lo|br-lan|wan|lan*|wlan*|phy*|usbwan) exit 0 ;;
+esac
+
+path="$(readlink -f "/sys/class/net/${DEVICENAME}/device" 2>/dev/null)"
+echo "$path" | grep -q "/usb" || exit 0
+
+driver="$(basename "$(readlink -f "/sys/class/net/${DEVICENAME}/device/driver" 2>/dev/null)" 2>/dev/null)"
+
+case "$driver" in
+	qmi_wwan|cdc_mbim)
+		logger -t usb-wan "skip $DEVICENAME ($driver), configure 4G/5G proto in LuCI"
+		exit 0
+		;;
+	rndis_host|cdc_ether|cdc_ncm|cdc_subset|huawei_cdc_ncm|ipheth|r8152|asix|ax88179_178a|sierra_net|"")
+		;;
+	*)
+		logger -t usb-wan "skip $DEVICENAME ($driver)"
+		exit 0
+		;;
+esac
+
+if [ -d /sys/class/net/usbwan ] && [ "$DEVICENAME" != usbwan ]; then
+	logger -t usb-wan "usbwan already present, skip $DEVICENAME"
+	exit 0
+fi
+
+if [ "$DEVICENAME" != usbwan ]; then
+	ip link set dev "$DEVICENAME" down 2>/dev/null || true
+	if ! ip link set dev "$DEVICENAME" name usbwan 2>/dev/null; then
+		logger -t usb-wan "rename $DEVICENAME -> usbwan failed"
+		exit 0
+	fi
+fi
+
+ip link set dev usbwan up 2>/dev/null || true
+
+if [ -z "$(uci -q get network.usbwan)" ]; then
+	uci -q batch <<-EOF
+		set network.usbwan=interface
+		set network.usbwan.proto='dhcp'
+		set network.usbwan.device='usbwan'
+		set network.usbwan.metric='10'
+		set network.usbwan.delegate='0'
+		set network.usbwan.ipv6='0'
+		commit network
+	EOF
+fi
+
+ubus call network reload >/dev/null 2>&1 || true
+ifup usbwan >/dev/null 2>&1 || true
+logger -t usb-wan "bound ${DEVICENAME} (${driver:-usb}) -> usbwan"
+exit 0
