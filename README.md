@@ -29,6 +29,10 @@
 
 ## 重新编译
 
-仓库 Actions 页 -> **Build ImmortalWrt** -> Run workflow。改 `.config`、`files/` 或 diy 脚本并推到 `main` 也会自动编。
+工作流文件在 `workflow/build.yml`。GitHub 需要它位于 `.github/workflows/build.yml` 才会开始云编译。
+
+如果 Actions 还没出现，在仓库网页新建文件 `.github/workflows/build.yml`，把 `workflow/build.yml` 的内容贴进去并提交。随后打开 Actions -> **Build ImmortalWrt** -> Run workflow。
+
+改 `.config`、`files/` 或 diy 脚本并推到 `main` 也会自动编。
 
 不装 iStore、插件商店和科学上网全家桶。要加包，把 `CONFIG_PACKAGE_xxx=y` 写进 `.config` 再编一次。
