@@ -18,4 +18,11 @@ cat > package/base-files/files/etc/banner << "EOF"
  -----------------------------------------------------
 EOF
 
+# Hugo U-Boot flashes kernel+rootfs. Do not use Device/EmmcImage
+# (that factory.bin is rootfs-only and will not persist).
+MK="target/linux/qualcommax/image/ipq60xx.mk"
+if [ -f "$MK" ]; then
+	python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
+fi
+
 echo "diy-part2 done"

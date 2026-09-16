@@ -121,6 +121,9 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/firmware"
           cp -a . "$GITHUB_WORKSPACE/firmware/"
           cp "$GITHUB_WORKSPACE/config.build" "$GITHUB_WORKSPACE/firmware/config.build"
+          python3 "$GITHUB_WORKSPACE/scripts/make-factory.py" \
+            "$(ls "$GITHUB_WORKSPACE/firmware/"*squashfs-sysupgrade.bin | head -n1)" \
+            "$GITHUB_WORKSPACE/firmware"
           echo "FIRMWARE=$GITHUB_WORKSPACE/firmware" >> "$GITHUB_ENV"
           ls -lh "$GITHUB_WORKSPACE/firmware"
 
@@ -139,7 +142,9 @@ jobs:
           name: Arthur ${{ env.FILE_DATE }}
           body: |
             JDCloud RE-SS-01 / Arthur USB WAN build
-            Flash `*squashfs-sysupgrade.bin` from LuCI.
+            U-Boot: flash `*squashfs-factory.bin` at http://192.168.1.1 (not /uimage.html).
+            Never flash `*initramfs*`. That is RAM-only and settings will not persist.
+            LuCI later: `*squashfs-sysupgrade.bin`.
             First boot Wi-Fi: `Arthur` / `Arthur-5G`, password `12345678`.
           files: firmware/*
           fail_on_unmatched_files: true
