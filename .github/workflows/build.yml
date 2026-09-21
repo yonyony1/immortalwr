@@ -10,6 +10,7 @@ on:
       - "diy-*.sh"
       - "files/**"
       - ".github/workflows/build.yml"
+      - "custom-feeds.conf"
 
 permissions:
   contents: write
