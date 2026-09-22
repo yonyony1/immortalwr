@@ -25,9 +25,3 @@ endif' feeds/nss_packages/qca-nss-drv/Makefile
 
 # ECM开启RMNET
 sed -i 's/ECM_INTERFACE_RMNET_ENABLE=n/ECM_INTERFACE_RMNET_ENABLE=y/' feeds/nss_packages/qca-nss-ecm/Makefile
-
-# 校验命令，编译日志中可查看修改结果是否生效
-echo "==== DRV RMNET CONFIG BLOCK ===="
-grep -A4 CONFIG_NSS_DRV_RMNET_ENABLE feeds/nss_packages/qca-nss-drv/Makefile
-echo "==== ECM RMNET CONFIG ===="
-grep ECM_INTERFACE_RMNET_ENABLE feeds/nss_packages/qca-nss-ecm/Makefile
