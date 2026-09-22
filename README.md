@@ -16,7 +16,7 @@
 
 ## 默认设置
 
-- 主题：LuCI Bootstrap（和你现在截图同一套）
+- 主题：LuCI Bootstrap
 - 语言：中文
 - 时区：Asia/Shanghai
 - 管理地址：`192.168.1.1`
