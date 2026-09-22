@@ -1,4 +1,4 @@
-# ImmortalWrt Arthur (JDCloud RE-SS-01)
+# ImmortalWrt (JDCloud RE-SS-01)
 
 京东云亚瑟自定义 ImmortalWrt 云编译。基于官方 `immortalwrt/immortalwrt` master，给USB随身WiFi和4g/5g模块把usb口当WAN用，再从亚瑟发出 Wi-Fi。
 
