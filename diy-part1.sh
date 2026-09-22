@@ -13,9 +13,12 @@ fi
 ./scripts/feeds install -a
 
 # ========== 方案A：修复nss-drv RMNET编译参数，开启ECM RMNET ==========
-# 给nss-drv的RMNET配置增加else分支，CONFIG_NSS_DRV_RMNET_ENABLE=y时传入NSS_DRV_RMNET_ENABLE=y
-sed -i '/ifndef CONFIG_NSS_DRV_RMNET_ENABLE/a \
-else\n   DRV_MAKE_OPTS += NSS_DRV_RMNET_ENABLE=y' feeds/nss_packages/qca-nss-drv/Makefile
+sed -i '/ifndef CONFIG_NSS_DRV_RMNET_ENABLE/,/endif/c\
+ifndef CONFIG_NSS_DRV_RMNET_ENABLE\
+   DRV_MAKE_OPTS += NSS_DRV_RMNET_ENABLE=n\
+else\
+   DRV_MAKE_OPTS += NSS_DRV_RMNET_ENABLE=y\
+endif' feeds/nss_packages/qca-nss-drv/Makefile
 
 # ECM开启RMNET
 sed -i 's/ECM_INTERFACE_RMNET_ENABLE=n/ECM_INTERFACE_RMNET_ENABLE=y/' feeds/nss_packages/qca-nss-ecm/Makefile
