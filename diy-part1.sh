@@ -25,3 +25,9 @@ endif' feeds/nss_packages/qca-nss-drv/Makefile
 
 # ECM开启RMNET
 sed -i 's/ECM_INTERFACE_RMNET_ENABLE=n/ECM_INTERFACE_RMNET_ENABLE=y/' feeds/nss_packages/qca-nss-ecm/Makefile
+
+# 加入依赖：必须等 qca-nss-drv 编译完成才编译 nss-ifb
+
+sed -i '/^DEPENDS:=/a \
+DEPENDS+=+kmod-qca-nss-drv' feeds/nss_packages/nss-ifb/Makefile
+
