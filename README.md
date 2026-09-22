@@ -31,10 +31,7 @@
 4G/5G 模块（QMI / MBIM / NCM）驱动和协议页也装了。这类设备不要走 DHCP 的 `usbwan`，在网络接口里选对应协议。
 
 ## 重新编译
-
-工作流文件在 `workflow/build.yml`。GitHub 需要它位于 `.github/workflows/build.yml` 才会开始云编译。
-
-如果 Actions 还没出现，在仓库网页新建文件 `.github/workflows/build.yml`，把 `workflow/build.yml` 的内容贴进去并提交。随后打开 Actions -> **Build ImmortalWrt** -> Run workflow。
+打开 Actions -> **Build ImmortalWrt** -> Run workflow。
 
 改 `.config`、`files/` 或 diy 脚本并推到 `main` 也会自动编。
 
