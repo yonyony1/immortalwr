@@ -140,7 +140,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ format('{0}-{1}', github.run_number, env.FILE_DATE) }}
-          name: Arthur ${{ env.FILE_DATE }}
+          name: immortalwrt ${{ env.FILE_DATE }}
           body: |
             JDCloud RE-SS-01
             U-Boot救砖刷机：刷 `*squashfs-factory.bin`，访问 http://192.168.1.1 上传（不要用 /uimage.html）
