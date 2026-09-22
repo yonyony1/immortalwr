@@ -1,26 +1,18 @@
 # ImmortalWrt Arthur (JDCloud RE-SS-01)
 
-京东云亚瑟自定义 ImmortalWrt 云编译。基于官方 `immortalwrt/immortalwrt` master，给 USB 随身 WiFi 当 WAN 用，再从亚瑟发出 Wi-Fi。
+京东云亚瑟自定义 ImmortalWrt 云编译。基于官方 `immortalwrt/immortalwrt` master，给USB随身WiFi和4g/5g模块把usb口当WAN用，再从亚瑟发出 Wi-Fi。
 
 ## 刷机
 
-你已经刷了 Hugo U-Boot 的话，**用 factory.bin，不要用 initramfs**。
-
 1. 到 [Releases](../../releases) 下载
-   `immortalwrt-qualcommax-ipq60xx-jdcloud_re-ss-01-squashfs-factory.bin`
-2. 电脑网线接亚瑟 LAN 口。按住 Reset 上电，灯闪几下后常亮，浏览器打开
+   `*squashfs-factory.bin`
+2. 电脑网线接亚瑟LAN口。按住Reset上电，灯闪几下后常亮，浏览器打开
    [http://192.168.1.1](http://192.168.1.1)
 3. 只在固件页上传 `*squashfs-factory.bin`。不要打开这些页面：
    - `/uimage.html`：只启动内存系统，重启就没了
    - `/img.html`：刷分区表，不是固件
    - `/uboot.html`：刷 U-Boot 本身
-4. 等它写完 eMMC 并自动重启。第一次开机大约 1 到 2 分钟
-5. 进后台改密码，再重启一次。设置还在，才说明 overlay 落在 eMMC 上，不是临时系统
-
-`initramfs-uImage.itb` 是内存固件，**绝对不要当刷机包上传**。
-以后已经在 ImmortalWrt 里了，再用 `*squashfs-sysupgrade.bin` 从 LuCI 升级。
-
-亚瑟 eMMC 有 A/B 两套分区。如果刷完还是旧系统，多半是另一套分区在启动。再进一次 U-Boot 刷 factory.bin，或用 U-Boot 的 bootconfig 切到刚刷的那套。
+4. openwrt类可以用 `*squashfs-sysupgrade.bin` 从 LuCI 升级。
 
 ## 默认设置
 
@@ -28,7 +20,6 @@
 - 语言：中文
 - 时区：Asia/Shanghai
 - 管理地址：`192.168.1.1`
-- Wi-Fi：`Arthur` / `Arthur-5G`
 - Wi-Fi 密码：`12345678`（进后台改掉）
 
 ## USB 随身 WiFi
@@ -37,6 +28,7 @@
 
 如果接口又没了，先拔插随身 WiFi。固件里有热插拔脚本和 watchdog，会尝试重新识别并复位 USB 网卡。
 
+支持qmodem管理器
 4G/5G 模块（QMI / MBIM / NCM）驱动和协议页也装了。这类设备不要走 DHCP 的 `usbwan`，在网络接口里选对应协议。
 
 ## 重新编译
