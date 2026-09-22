@@ -145,7 +145,6 @@ jobs:
             JDCloud RE-SS-01
             U-Boot救砖刷机：刷 `*squashfs-factory.bin`，访问 http://192.168.1.1 上传（不要用 /uimage.html）
             ✅日常LuCI升级：使用 `*squashfs-sysupgrade.bin`
-             wifi密码：12345678
             首次刷factory.bin开机，系统会自动初始化overlay分区，配置断电保存。
 
           files: firmware/*
