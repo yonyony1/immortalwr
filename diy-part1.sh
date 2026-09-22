@@ -12,8 +12,11 @@ fi
 # 安装注册包，此时feeds/nss_packages目录文件就绪
 ./scripts/feeds install -a
 
-# ========== 方案A：修复nss-drv RMNET编译参数，开启ECM RMNET ==========
-sed -i '/ifndef CONFIG_NSS_DRV_RMNET_ENABLE/,/endif/c\
+# ========== 方案A：修复sed换行丢失endif的bug ==========
+# 删除旧的RMNET ifndef~endif代码块
+sed -i '/ifndef CONFIG_NSS_DRV_RMNET_ENABLE/,/endif/d' feeds/nss_packages/qca-nss-drv/Makefile
+# 插入完整正确代码块
+sed -i '/CONFIG_NSS_DRV_RMNET_ENABLE/a\
 ifndef CONFIG_NSS_DRV_RMNET_ENABLE\
    DRV_MAKE_OPTS += NSS_DRV_RMNET_ENABLE=n\
 else\
@@ -25,6 +28,6 @@ sed -i 's/ECM_INTERFACE_RMNET_ENABLE=n/ECM_INTERFACE_RMNET_ENABLE=y/' feeds/nss_
 
 # 校验命令，编译日志中可查看修改结果是否生效
 echo "==== DRV RMNET CONFIG BLOCK ===="
-grep -A3 CONFIG_NSS_DRV_RMNET_ENABLE feeds/nss_packages/qca-nss-drv/Makefile
+grep -A4 CONFIG_NSS_DRV_RMNET_ENABLE feeds/nss_packages/qca-nss-drv/Makefile
 echo "==== ECM RMNET CONFIG ===="
 grep ECM_INTERFACE_RMNET_ENABLE feeds/nss_packages/qca-nss-ecm/Makefile
