@@ -19,7 +19,7 @@
 - 主题：LuCI Bootstrap
 - 语言：中文
 - 时区：Asia/Shanghai
-- 管理地址：`192.168.1.1`
+- 管理地址：`192.168.1.1`用户名：root密码:无
 
 ## USB 随身 WiFi
 
