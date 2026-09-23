@@ -26,8 +26,12 @@ endif' feeds/nss_packages/qca-nss-drv/Makefile
 # ECM开启RMNET
 sed -i 's/ECM_INTERFACE_RMNET_ENABLE=n/ECM_INTERFACE_RMNET_ENABLE=y/' feeds/nss_packages/qca-nss-ecm/Makefile
 
-# 加入依赖：必须等 qca-nss-drv 编译完成才编译 nss-ifb
-
-sed -i '/^DEPENDS:=/a \
-DEPENDS+=+kmod-qca-nss-drv' feeds/nss_packages/nss-ifb/Makefile
+# 防止重复添加PKG_BUILD_DEPENDS
+if ! grep -q "PKG_BUILD_DEPENDS:=qca-nss-drv" "${NSS_IFB_MK}"; then
+    sed -i '/PKG_RELEASE:=3/a \
+PKG_BUILD_DEPENDS:=qca-nss-drv' "${NSS_IFB_MK}"
+    echo "✅ patched nss-ifb PKG_BUILD_DEPENDS"
+else
+    echo "ℹ️ nss-ifb PKG_BUILD_DEPENDS already exists, skip"
+fi
 
