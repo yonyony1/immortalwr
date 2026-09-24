@@ -13,7 +13,7 @@ fi
 
 mkdir -p package/base-files/files/etc
 cat > package/base-files/files/etc/banner << "EOF"
-  ImmortalWrt Arthur (JDCloud RE-SS-01)
+  ImmortalWrt  (JDCloud RE-SS-01)
   USB WAN build: plug portable WiFi, then share over Wi-Fi
  -----------------------------------------------------
 EOF
