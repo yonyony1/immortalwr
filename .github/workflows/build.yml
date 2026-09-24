@@ -21,8 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REPO_URL: https://github.com/yonyony1/immortalwrt
-  REPO_BRANCH: openwrt-25.12
+  REPO_URL: https://github.com/yonyony1/immortalwrt-guanfangku
+  REPO_BRANCH: master
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
