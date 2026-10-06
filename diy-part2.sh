@@ -26,10 +26,10 @@ if [ -f "$MK" ]; then
 fi
 
 # ========== 新增：修复uhttpd GCC12 stringop-overread编译报错 ==========
-UHTTPD_SRC="package/network/services/uhttpd/src/client.c"
-if [ -f "$UHTTPD_SRC" ]; then
-    sed -i 's|if (!strcmp(blobmsg_name(cur), "URL"))|if (blobmsg_name(cur) && !strcmp(blobmsg_name(cur), "URL"))|' "$UHTTPD_SRC"
+UHTTPD_MK="package/network/services/uhttpd/Makefile"
+if [ -f "$UHTTPD_MK" ]; then
+    # 在CMAKE_OPTIONS行追加CFLAG，关闭该警告
+    sed -i '/CMAKE_OPTIONS +=/ s|$| -DCMAKE_C_FLAGS="-Wno-error=stringop-overread"|' "$UHTTPD_MK"
 fi
-
 
 echo "diy-part2 done"
