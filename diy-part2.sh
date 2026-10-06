@@ -25,4 +25,11 @@ if [ -f "$MK" ]; then
 	python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
+# ========== 新增：修复uhttpd GCC12 stringop-overread编译报错 ==========
+UHTTPD_SRC="package/network/services/uhttpd/src/client.c"
+if [ -f "$UHTTPD_SRC" ]; then
+    sed -i 's|if (!strcmp(blobmsg_name(cur), "URL"))|if (blobmsg_name(cur) && !strcmp(blobmsg_name(cur), "URL"))|' "$UHTTPD_SRC"
+fi
+
+
 echo "diy-part2 done"
