@@ -28,8 +28,8 @@ fi
 # ========== 新增：修复uhttpd GCC12 stringop-overread编译报错 ==========
 UHTTPD_MK="package/network/services/uhttpd/Makefile"
 if [ -f "$UHTTPD_MK" ]; then
-    # 在CMAKE_OPTIONS行追加CFLAG，关闭该警告
-    sed -i '/CMAKE_OPTIONS +=/ s|$| -DCMAKE_C_FLAGS="-Wno-error=stringop-overread"|' "$UHTTPD_MK"
+    sed -i '/ifneq ($(CONFIG_USE_GLIBC),)/i \
+TARGET_CFLAGS += -Wno-error=stringop-overread' "$UHTTPD_MK"
 fi
 
 echo "diy-part2 done"
