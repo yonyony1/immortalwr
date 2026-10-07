@@ -32,11 +32,24 @@ if [ -f "$UHTTPD_MK" ]; then
 TARGET_CFLAGS += -Wno-error=stringop-overread' "$UHTTPD_MK"
 fi
 
-# ========== hostapd fix: remove he_mu_edca code ==========
+# hostapd 补丁：注释 he_mu_edca，使用patch文件方式（正确时机）
 if package_enabled hostapd wpad wpad-full-openssl; then
-  echo ">> Patch hostapd: disable he_mu_edca in hostapd_fill_csa_settings"
-  # 注释掉4684行 he_mu_edca 那一行
-  sed -i '4684 s/^/#/' package/network/services/hostapd/src/ap/hostapd.c
+  echo ">> Create hostapd patch to disable he_mu_edca"
+  mkdir -p package/network/services/hostapd/patches
+  cat > package/network/services/hostapd/patches/0001-disable-he_mu_edca.patch <<'EOF'
+--- a/src/ap/hostapd.c
++++ b/src/ap/hostapd.c
+@@ -4681,7 +4681,7 @@ static void hostapd_fill_csa_settings(struct hostapd_data *hapd,
+ 	conf->csa_ecsa_beacon_tx = params->csa_ecsa_beacon_tx;
+ 	conf->csa_no_ht = params->csa_no_ht;
+ 
+-	hapd->iface->conf->he_mu_edca.he_qos_info &= 0xfff0;
++	//hapd->iface->conf->he_mu_edca.he_qos_info &= 0xfff0;
+ }
+ 
+ static int hostapd_setup_csa(struct hostapd_data *hapd,
+EOF
 fi
+
 
 echo "diy-part2 done"
