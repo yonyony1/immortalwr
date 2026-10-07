@@ -32,4 +32,11 @@ if [ -f "$UHTTPD_MK" ]; then
 TARGET_CFLAGS += -Wno-error=stringop-overread' "$UHTTPD_MK"
 fi
 
+# ========== hostapd fix: remove he_mu_edca code ==========
+if package_enabled hostapd wpad wpad-full-openssl; then
+  echo ">> Patch hostapd: disable he_mu_edca in hostapd_fill_csa_settings"
+  # 注释掉4684行 he_mu_edca 那一行
+  sed -i '4684 s/^/#/' package/network/services/hostapd/src/ap/hostapd.c
+fi
+
 echo "diy-part2 done"
