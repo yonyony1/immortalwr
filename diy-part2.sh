@@ -25,20 +25,12 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# 修复hostapd he_mu_edca结构体缺失：强制开启 CONFIG_EHT 编译宏
-mkdir -p package/network/services/hostapd/patches
-cat > package/network/services/hostapd/patches/000-fix-hostapd-eht-compile.patch <<'EOF'
---- a/package/network/services/hostapd/Makefile
-+++ b/package/network/services/hostapd/Makefile
-@@ -112,6 +112,7 @@ DRIVER_MAKEOPTS= \
- 	CONFIG_IEEE80211AC=$(HOSTAPD_IEEE80211AC) \
- 	CONFIG_IEEE80211AX=$(HOSTAPD_IEEE80211AX) \
- 	CONFIG_IEEE80211BE=$(HOSTAPD_IEEE80211BE) \
-+	CONFIG_EHT=y \
- 	CONFIG_ACS=y CONFIG_DRIVER_NL80211=y
- EOF
+# ========== 修复hostapd：sed修改package Makefile，不再使用patch文件 ==========
+echo "Add CONFIG_EHT=y to hostapd DRIVER_MAKEOPTS"
+sed -i '/CONFIG_IEEE80211BE=$(HOSTAPD_IEEE80211BE) \\/a \\
+CONFIG_EHT=y \\' package/network/services/hostapd/Makefile
 
-# 清理旧编译缓存，保证补丁重新应用
+# 清理hostapd编译缓存
 make package/network/services/hostapd clean
 rm -rf build_dir/target-*_hostapd*
 
