@@ -25,11 +25,4 @@ if [ -f "$MK" ]; then
 	python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# ========== 新增：修复uhttpd GCC12 stringop-overread编译报错 ==========
-UHTTPD_MK="package/network/services/uhttpd/Makefile"
-if [ -f "$UHTTPD_MK" ]; then
-    sed -i '/ifneq ($(CONFIG_USE_GLIBC),)/i \
-TARGET_CFLAGS += -Wno-error=stringop-overread' "$UHTTPD_MK"
-fi
-
 echo "diy-part2 done"
