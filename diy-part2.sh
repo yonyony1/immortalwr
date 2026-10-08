@@ -25,13 +25,23 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# ========== 修复hostapd：sed修改package Makefile，不再使用patch文件 ==========
-echo "Add CONFIG_EHT=y to hostapd DRIVER_MAKEOPTS"
-sed -i '/CONFIG_IEEE80211BE=$(HOSTAPD_IEEE80211BE) \\/a \\
-CONFIG_EHT=y \\' package/network/services/hostapd/Makefile
-
-# 清理hostapd编译缓存
+# 方案B：打补丁修复hostapd.c源码，无需修改Makefile
+mkdir -p package/network/services/hostapd/patches
+cat > package/network/services/hostapd/patches/0001-fix-he_mu_edca.patch <<'EOF'
+--- a/src/ap/hostapd.c
++++ b/src/ap/hostapd.c
+@@ -4681,7 +4681,9 @@ static void hostapd_fill_csa_settings(struct hostapd_iface *iface)
+ 		if (conf->he_opmode & HE_OPMODE_CHANNEL_WIDTH_MASK)
+ 			conf->he_opmode &= ~HE_OPMODE_CHANNEL_WIDTH_MASK;
+ 
++#ifdef CONFIG_EHT
+ 		hapd->iface->conf->he_mu_edca.he_qos_info &= 0xfff0;
++#endif
+ 	}
+ }
+EOF
 make package/network/services/hostapd clean
 rm -rf build_dir/target-*_hostapd*
+
 
 echo "diy-part2 done"
