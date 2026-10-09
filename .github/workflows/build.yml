@@ -107,16 +107,21 @@ jobs:
         run: |
           cd openwrt
           echo "$(nproc) thread compile"
-
-          # ========== 方案B：预编译tools+toolchain，生成host staging工具，解决host sed缺失 ==========
+          # 1. 构建基础工具链，完成target prereq，生成内核版本文件
           make tools/install -j$(nproc)
           make toolchain/install -j$(nproc)
-
-          # 清理hostapd旧产物，单独编译hostapd验证he_mu_edca修复
+          # 2. hostapd prepare：解压源码（此时内核prereq已经就绪，不会报错）
+          make package/network/services/hostapd/prepare V=s
+          # 3. 找到hostapd.c，注释4684行报错代码
+          HP_C=$(find build_dir/target-*/hostapd-wpad-basic-openssl/hostapd-*/src/ap/hostapd.c)
+          if [ -f "$HP_C" ]; then
+            sed -i '4684 s/^/\/\//' "$HP_C"
+          fi
+          # 4. 清理旧产物，开始编译hostapd
           make package/network/services/hostapd/clean
           make package/network/services/hostapd/compile V=s
-
           echo "status=success" >> "$GITHUB_OUTPUT"
+
           # 下面固件相关代码暂时注释，hostapd调试成功后恢复
           # grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           # [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> "$GITHUB_ENV"
