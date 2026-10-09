@@ -107,11 +107,14 @@ jobs:
         run: |
           cd openwrt
           echo "$(nproc) thread compile"
-          make -j"$(nproc)" || make -j1 V=s
+          # 单独编译 hostapd，用于验证 he_mu_edca 修复，调试通过再切回完整编译
+          make package/network/services/hostapd/clean
+          make package/network/services/hostapd/compile V=s
           echo "status=success" >> "$GITHUB_OUTPUT"
-          grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-          [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> "$GITHUB_ENV"
-          echo "FILE_DATE=$(date +"%Y%m%d-%H%M")" >> "$GITHUB_ENV"
+          # 下面这两行固件相关暂时注释，hostapd调试成功后取消注释
+          # grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+          # [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> "$GITHUB_ENV"
+          # echo "FILE_DATE=$(date +"%Y%m%d-%H%M")" >> "$GITHUB_ENV"
 
       - name: Organize files
         id: organize
