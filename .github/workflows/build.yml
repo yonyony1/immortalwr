@@ -107,18 +107,15 @@ jobs:
         run: |
           cd openwrt
           echo "$(nproc) thread compile"
-          # 1. 构建基础工具链，完成target prereq，生成内核版本文件
           make tools/install -j$(nproc)
           make toolchain/install -j$(nproc)
-          # 2. hostapd prepare：解压源码（此时内核prereq已经就绪，不会报错）
+          # 【顺序修正】先clean，再prepare解压源码，再sed修改
+          make package/network/services/hostapd/clean
           make package/network/services/hostapd/prepare V=s
-          # 3. 找到hostapd.c，注释4684行报错代码
           HP_C=$(find build_dir/target-*/hostapd-wpad-basic-openssl/hostapd-*/src/ap/hostapd.c)
           if [ -f "$HP_C" ]; then
             sed -i '4684 s/^/\/\//' "$HP_C"
           fi
-          # 4. 清理旧产物，开始编译hostapd
-          make package/network/services/hostapd/clean
           make package/network/services/hostapd/compile V=s
           echo "status=success" >> "$GITHUB_OUTPUT"
 
