@@ -22,27 +22,4 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# ========== 修复 lua host编译 sed 不存在 ==========
-LUA_MK="package/utils/lua/Makefile"
-if [ -f "$LUA_MK" ]; then
-  sed -i 's|$(STAGING_DIR_HOST)/bin/sed|sed|g' "$LUA_MK"
-fi
-
-# ========== hostapd Build/Prepare 安全注入 ==========
-H_MK="package/network/services/hostapd/Makefile"
-if [ -f "$H_MK" ]; then
-  sed -i '/^define Build\/Prepare/,/^endef/d' "$H_MK"
-  cat >> "$H_MK" <<'EOF'
-define Build/Prepare
-	$(call Build/Prepare/Default)
-	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/hostapd.c
-	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/drv_callbacks.c
-	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/ieee802_11_he.c
-	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/wmm.c
-	sed -i 's/.*EVENT_UPDATE_MUEDCA_PARAMS.*/\/\/ &/' $(PKG_BUILD_DIR)/src/drivers/driver_nl80211_event.c
-endef
-EOF
-fi
-rm -f package/network/services/hostapd/patches/0001-fix-he_mu_edca.patch
-
 echo "diy-part2 done"
