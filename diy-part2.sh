@@ -22,25 +22,27 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# ========== 删掉旧的Build/PostPatch代码，改用Build/Prepare钩子 ==========
-# 覆盖hostapd包的Build/Prepare，解压源码后立刻注释he_mu_edca相关代码
-cat > package/network/services/hostapd/Makefile.prepend <<'EOF'
+# ========== 修复 lua host编译 sed 不存在 ==========
+LUA_MK="package/utils/lua/Makefile"
+if [ -f "$LUA_MK" ]; then
+  sed -i 's|$(STAGING_DIR_HOST)/bin/sed|sed|g' "$LUA_MK"
+fi
+
+# ========== hostapd Build/Prepare 安全注入 ==========
+H_MK="package/network/services/hostapd/Makefile"
+if [ -f "$H_MK" ]; then
+  sed -i '/^define Build\/Prepare/,/^endef/d' "$H_MK"
+  cat >> "$H_MK" <<'EOF'
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	# 注释所有包含 he_mu_edca 的代码行
-	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/hostapd.c
-	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/drv_callbacks.c
-	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/ieee802_11_he.c
-	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/wmm.c
-	$(SED) 's/.*EVENT_UPDATE_MUEDCA_PARAMS.*/\/\/ &/' $(PKG_BUILD_DIR)/src/drivers/driver_nl80211_event.c
+	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/hostapd.c
+	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/drv_callbacks.c
+	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/ieee802_11_he.c
+	sed -i 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/wmm.c
+	sed -i 's/.*EVENT_UPDATE_MUEDCA_PARAMS.*/\/\/ &/' $(PKG_BUILD_DIR)/src/drivers/driver_nl80211_event.c
 endef
 EOF
-# 把Build/Prepare插入hostapd Makefile开头
-sed -i '/^include \.\.\/\.\.\/package\.mk/r package/network/services/hostapd/Makefile.prepend' package/network/services/hostapd/Makefile
-
-# 清理hostapd旧缓存
-make package/network/services/hostapd clean
-rm -rf build_dir/target-*_hostapd*
+fi
 rm -f package/network/services/hostapd/patches/0001-fix-he_mu_edca.patch
 
 echo "diy-part2 done"
