@@ -25,23 +25,20 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-# 方案B：打补丁修复hostapd.c源码，无需修改Makefile
-mkdir -p package/network/services/hostapd/patches
-cat > package/network/services/hostapd/patches/0001-fix-he_mu_edca.patch <<'EOF'
---- a/src/ap/hostapd.c
-+++ b/src/ap/hostapd.c
-@@ -4681,7 +4681,9 @@ static void hostapd_fill_csa_settings(struct hostapd_iface *iface)
- 		if (conf->he_opmode & HE_OPMODE_CHANNEL_WIDTH_MASK)
- 			conf->he_opmode &= ~HE_OPMODE_CHANNEL_WIDTH_MASK;
- 
-+#ifdef CONFIG_EHT
- 		hapd->iface->conf->he_mu_edca.he_qos_info &= 0xfff0;
-+#endif
- 	}
- }
+# ===================== Build/PostPatch：批量注释所有 he_mu_edca 代码 =====================
+cat >> package/network/services/hostapd/Makefile <<'EOF'
+define Build/PostPatch
+	# 注释所有直接访问 he_mu_edca 的代码行
+	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/hostapd.c
+	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/drv_callbacks.c
+	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/ieee802_11_he.c
+	$(SED) 's/.*he_mu_edca.*/\/\/ &/' $(PKG_BUILD_DIR)/src/ap/wmm.c
+	$(SED) 's/.*EVENT_UPDATE_MUEDCA_PARAMS.*/\/\/ &/' $(PKG_BUILD_DIR)/src/drivers/driver_nl80211_event.c
+endef
 EOF
+
+# 清理hostapd缓存
 make package/network/services/hostapd clean
 rm -rf build_dir/target-*_hostapd*
-
 
 echo "diy-part2 done"
