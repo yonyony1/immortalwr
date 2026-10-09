@@ -22,4 +22,14 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
+# diy-part2.sh 添加下面代码，注释报错4684行
+cd openwrt
+# 解压hostapd源码
+make package/network/services/hostapd/prepare V=s
+# 找到hostapd.c，注释4684行
+HP_C=$(find build_dir/target-*/hostapd-wpad-basic-openssl/hostapd-*/src/ap/hostapd.c)
+if [ -f "$HP_C" ]; then
+  sed -i '4684 s/^/\/\//' "$HP_C"
+fi
+
 echo "diy-part2 done"
