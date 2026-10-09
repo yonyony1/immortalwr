@@ -106,19 +106,13 @@ jobs:
         id: compile
         run: |
           cd openwrt
+          # 删除LibWrt自带MU-EDCA补丁，消除he_mu_edca编译报错
+          rm -f package/network/services/hostapd/patches/900-hostapd-update-muedca-params.patch
           echo "$(nproc) thread compile"
           make tools/install -j$(nproc)
           make toolchain/install -j$(nproc)
           make package/network/services/hostapd/clean
           make package/network/services/hostapd/prepare V=s
-          HP_C=$(find build_dir/target-*/hostapd-wpad-basic-openssl/hostapd-*/src/ap/hostapd.c)
-          if [ -f "$HP_C" ]; then
-            echo "找到hostapd.c: $HP_C"
-            sed -i '/he_mu_edca.he_qos_info/d' "$HP_C"
-            grep 'he_mu_edca.he_qos_info' "$HP_C" || echo "✅ he_mu_edca代码行已删除"
-          else
-            echo "❌ 未找到hostapd.c文件，请检查路径"
-          fi
           make package/network/services/hostapd/compile V=s
           echo "status=success" >> "$GITHUB_OUTPUT"
 
