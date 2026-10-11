@@ -22,6 +22,4 @@ if [ -f "$MK" ]; then
         python3 "$(cd "$(dirname "$0")" && pwd)/scripts/patch-factory-recipe.py" "$MK"
 fi
 
-rm -f package/network/services/hostapd/patches/900-hostapd-update-muedca-params.patch
-
 echo "diy-part2 done"
